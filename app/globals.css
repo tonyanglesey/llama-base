@@ -15,9 +15,18 @@
  * token set (`--bg`, `--panel`, `--accent-ink`, …); we map those names onto the
  * shared semantic tokens here so everything reads from one source of truth and
  * switches light/dark automatically. CSS vars resolve lazily, so these aliases
- * follow `[data-theme]` even though they're declared once on :root.
+ * follow `[data-theme]` even though they map to fixed semantic names.
+ *
+ * The `[data-theme]` selectors aren't for theming (the values already switch via
+ * the vars they reference) — they exist to MATCH the specificity of @lla-ma/ui's
+ * own `:root[data-theme=…]` rules. Notably `--muted`: the design system defines
+ * it as a dark *surface* (background-elev-2), but the console components use
+ * `--muted` for muted *text*. Without this specificity bump the surface color
+ * wins and muted text renders nearly invisible against the background.
  */
-:root {
+:root,
+:root[data-theme="dark"],
+:root[data-theme="light"] {
   --bg: var(--background);
   --panel: var(--background-elev-1);
   --fg: var(--foreground);
