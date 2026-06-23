@@ -196,17 +196,17 @@ export default function Page() {
             // TODO: wire real destinations — these are placeholders for now.
             title: "DEVELOPERS",
             links: [
-              { label: "Docs", href: "#" },
-              { label: "API status", href: "#" },
-              { label: "Sign in", href: "#" },
-              { label: "Sign up", href: "#" },
+              { label: "Docs", href: "https://lla.ma/docs" },
+              { label: "API status", href: "https://api.lla.ma" },
+              { label: "Sign in", href: "https://lla.ma/login" },
+              { label: "Sign up", href: "https://lla.ma/register" },
             ],
           },
           {
             title: "COMPANY",
             links: [
-              { label: "Account", href: "#" },
-              { label: "Contact", href: "#" },
+              { label: "Account", href: "https://lla.ma/account" },
+              { label: "Contact", href: "mailto:hello@lla.ma" },
             ],
           },
         ]}
