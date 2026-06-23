@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@lla-ma/ui": "^0.1.0",
+    "@lla-ma/ui": "^0.1.1",
     "next": "^15.0.0",
     "pg": "^8.13.0",
     "react": "^19.0.0",

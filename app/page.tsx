@@ -84,8 +84,10 @@ export default function Page() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Shared lla.ma shell: logo + Platform·Base·Apps switcher + theme. */}
-      <LlamaHeader app="base" theme={theme} onToggleTheme={toggleTheme} />
+      {/* Shared lla.ma shell: logo + Platform·Base·Apps switcher + theme.
+          Full-bleed (maxWidth="100%") so it lines up with the edge-to-edge
+          console toolbar and sidebar below, rather than the 1320px marketing cap. */}
+      <LlamaHeader app="base" theme={theme} onToggleTheme={toggleTheme} maxWidth="100%" />
 
       {/* The console fills the viewport below the header; the footer follows. */}
       <div
@@ -176,6 +178,7 @@ export default function Page() {
 
       <LlamaFooter
         theme={theme}
+        maxWidth="100%"
         tagline="The self-hosted, AI-native Postgres console — Supabase Studio's polish, for any Postgres, on your own box."
         copyright="lla.ma · © 2026 Via Ventures"
         columns={[
