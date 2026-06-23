@@ -192,6 +192,23 @@ export default function Page() {
               { label: "lla.ma", href: "https://lla.ma" },
             ],
           },
+          {
+            // TODO: wire real destinations — these are placeholders for now.
+            title: "DEVELOPERS",
+            links: [
+              { label: "Docs", href: "#" },
+              { label: "API status", href: "#" },
+              { label: "Sign in", href: "#" },
+              { label: "Sign up", href: "#" },
+            ],
+          },
+          {
+            title: "COMPANY",
+            links: [
+              { label: "Account", href: "#" },
+              { label: "Contact", href: "#" },
+            ],
+          },
         ]}
       />
     </div>
