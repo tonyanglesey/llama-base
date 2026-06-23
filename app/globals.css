@@ -1,0 +1,54 @@
+@import "tailwindcss";
+@import "@lla-ma/ui/styles.css";
+
+/* Let Tailwind discover the utility classes used inside the @lla-ma/ui shell
+   components (the header's `hidden md:flex` responsive switches, etc.) so they
+   get generated even though they live in node_modules. */
+@source "../node_modules/@lla-ma/ui/dist";
+
+/*
+ * lla.ma base — theme wiring.
+ *
+ * Colors come from the shared @lla-ma/ui palette (imported above), which is
+ * driven by a `data-theme` attribute on <html> (set by the no-flash script in
+ * app/layout.tsx). The console's components were written against a small local
+ * token set (`--bg`, `--panel`, `--accent-ink`, …); we map those names onto the
+ * shared semantic tokens here so everything reads from one source of truth and
+ * switches light/dark automatically. CSS vars resolve lazily, so these aliases
+ * follow `[data-theme]` even though they're declared once on :root.
+ */
+:root {
+  --bg: var(--background);
+  --panel: var(--background-elev-1);
+  --fg: var(--foreground);
+  --muted: var(--foreground-muted);
+  --accent-ink: var(--accent);
+  /* --accent, --border and --danger come straight from @lla-ma/ui */
+}
+
+/* Surface overlays that genuinely differ between themes. */
+:root,
+:root[data-theme="dark"] {
+  --hover: rgba(255, 255, 255, 0.05); /* row / item hover */
+  --inset: rgba(0, 0, 0, 0.2); /* recessed cards / result panes */
+  --field: rgba(0, 0, 0, 0.3); /* inputs / editable cells */
+  --code: rgba(0, 0, 0, 0.4); /* code + error <pre> blocks */
+}
+
+:root[data-theme="light"] {
+  --hover: rgba(0, 0, 0, 0.04);
+  --inset: rgba(0, 0, 0, 0.04);
+  --field: var(--background-elev-1);
+  --code: rgba(0, 0, 0, 0.05);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--font-sans, ui-sans-serif, system-ui, -apple-system,
+      BlinkMacSystemFont, "Segoe UI", sans-serif);
+}
