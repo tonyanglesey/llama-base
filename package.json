@@ -4,7 +4,9 @@
   "description": "The self-hosted, AI-native Postgres console — Supabase Studio's polish, for any Postgres, on your own box.",
   "license": "Apache-2.0",
   "scripts": {
-    "dev": "next dev -H 127.0.0.1 -p 3939",
+    "dev": "node scripts/dev.mjs",
+    "dev:no-tunnel": "next dev -H 127.0.0.1 -p 3939",
+    "tunnel": "node scripts/tunnel.mjs",
     "build": "next build",
     "start": "next start -H 127.0.0.1 -p 3939",
     "typecheck": "tsc --noEmit"

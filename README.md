@@ -66,12 +66,20 @@ All config is environment variables (no UI to clutter — point it at a database
 
 ### Connecting to a remote box over SSH
 
-If Postgres isn't exposed publicly (it shouldn't be), tunnel to it and point lla.ma base at the local end:
+If your Postgres isn't exposed publicly (it shouldn't be), lla.ma base can open the SSH tunnel for you — no second terminal, no manual `ssh` command. Add an `SSH_*` block to `.env`:
 
 ```bash
-ssh -N -L 5433:localhost:5432 user@your-box
-# then: PG_HOST=127.0.0.1  PG_PORT=5433
+SSH_TUNNEL=on
+SSH_HOST=your-box.example.com
+SSH_USER=ubuntu
+SSH_KEY=~/.ssh/id_rsa        # omit to use your ssh-agent
+SSH_REMOTE_PORT=5432         # the DB port on that box
+# point the app at the tunnel's local end:
+PG_HOST=127.0.0.1
+PG_PORT=5433
 ```
+
+Then `npm run dev` opens the tunnel automatically before starting the app (and closes it on exit). Need just the tunnel? `npm run tunnel`. Connecting to a local/RDS/Neon database instead? Leave `SSH_TUNNEL` unset and `npm run dev` is a plain dev server.
 
 ---
 

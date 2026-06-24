@@ -25,6 +25,25 @@ const PG_PASSWORD = process.env.PG_PASSWORD ?? "";
 const PG_ADMIN_DB = process.env.PG_ADMIN_DB ?? "postgres";
 const PG_SSL = (process.env.PG_SSL ?? "off").toLowerCase();
 
+/**
+ * What we're actually connected to, for the UI status line. When an SSH tunnel
+ * is in play PG_HOST is just the local tunnel mouth (127.0.0.1) — the host the
+ * operator cares about is the box on the far end (SSH_HOST), reached on its own
+ * Postgres port. Without a tunnel, PG_HOST/PG_PORT is the real target.
+ */
+export function connectionTarget(): { host: string; port: number } {
+  const tunnelOn = ["on", "true", "1", "yes"].includes(
+    (process.env.SSH_TUNNEL ?? "").toLowerCase()
+  );
+  if (tunnelOn && process.env.SSH_HOST) {
+    return {
+      host: process.env.SSH_HOST,
+      port: Number(process.env.SSH_REMOTE_PORT ?? 5432),
+    };
+  }
+  return { host: PG_HOST, port: PG_PORT };
+}
+
 function baseConfig(database: string): PoolConfig {
   return {
     host: PG_HOST,

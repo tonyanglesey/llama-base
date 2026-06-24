@@ -8,7 +8,14 @@ import DataGrid from "@/components/DataGrid";
 import Overview from "@/components/Overview";
 
 type Health =
-  | { ok: true; version: string; database: string; serverTime: string }
+  | {
+      ok: true;
+      version: string;
+      database: string;
+      serverTime: string;
+      host: string;
+      port: number;
+    }
   | { ok: false; error: string };
 
 type DbResp = { ok: boolean; databases?: string[]; error?: string };
@@ -95,34 +102,41 @@ export default function Page() {
         style={{ minHeight: "calc(100vh - 54px)" }}
       >
         {/* Console toolbar — view tabs, health, read-only/write switch. */}
-        <div className="flex items-center gap-4 border-b border-[var(--border)] bg-[var(--panel)] px-4 py-2.5">
-          <HealthDot health={health} />
+        <div className="flex items-stretch border-b border-[var(--border)] bg-[var(--panel)]">
+          {/* Status block — same width + right border as the sidebar, so the
+              tabs beside it line up with the content panel below. */}
+          <div className="flex w-72 shrink-0 items-center border-r border-[var(--border)] px-3 py-2.5">
+            <HealthDot health={health} />
+          </div>
 
-          <nav className="ml-2 flex gap-1">
-            <Tab active={view === "overview"} onClick={() => setView("overview")}>
-              overview
-            </Tab>
-            <Tab active={view === "browse"} onClick={() => setView("browse")}>
-              browse
-            </Tab>
-            <Tab active={view === "sql"} onClick={() => setView("sql")}>
-              sql
-            </Tab>
-          </nav>
+          {/* Tabs + controls sit over the content panel (px-6 matches its p-6). */}
+          <div className="flex flex-1 items-center gap-4 px-6 py-2.5">
+            <nav className="flex gap-1">
+              <Tab active={view === "overview"} onClick={() => setView("overview")}>
+                overview
+              </Tab>
+              <Tab active={view === "browse"} onClick={() => setView("browse")}>
+                browse
+              </Tab>
+              <Tab active={view === "sql"} onClick={() => setView("sql")}>
+                sql
+              </Tab>
+            </nav>
 
-          <div className="ml-auto" />
+            <div className="ml-auto" />
 
-          <button
-            onClick={() => setReadOnly((r) => !r)}
-            title="Toggle read-only / write mode"
-            className={`rounded border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
-              readOnly
-                ? "border-[var(--border)] text-[var(--muted)] hover:text-[var(--fg)]"
-                : "border-[var(--danger)] bg-[var(--danger)]/10 text-[var(--danger)]"
-            }`}
-          >
-            {readOnly ? "● read-only" : "● write mode"}
-          </button>
+            <button
+              onClick={() => setReadOnly((r) => !r)}
+              title="Toggle read-only / write mode"
+              className={`rounded border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
+                readOnly
+                  ? "border-[var(--border)] text-[var(--muted)] hover:text-[var(--fg)]"
+                  : "border-[var(--danger)] bg-[var(--danger)]/10 text-[var(--danger)]"
+              }`}
+            >
+              {readOnly ? "● read-only" : "● write mode"}
+            </button>
+          </div>
         </div>
 
         <div className="flex min-h-0 flex-1">
@@ -229,6 +243,11 @@ function HealthDot({ health }: { health: Health | null }) {
         }`}
       />
       {health == null ? "connecting…" : ok ? "connected" : "connection failed"}
+      {ok && health?.host && (
+        <span className="text-[var(--muted)] opacity-70">
+          · {health.host}:{health.port}
+        </span>
+      )}
     </span>
   );
 }
