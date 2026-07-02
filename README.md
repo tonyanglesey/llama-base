@@ -6,7 +6,7 @@
 
 Browse schema, edit data, run SQL, and read an at-a-glance Overview dashboard for *any* PostgreSQL database — RDS, Neon, a bare VPS, or your laptop. No vendor lock-in. Runs as a single container you own.
 
-<div align="center"><img src="/public/llama-base.png" />
+<div align="center"><img src="/public/llama-github-base.png" />
 </div>
 
 ---
