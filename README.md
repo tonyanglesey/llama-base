@@ -2,6 +2,10 @@
 
 # lla.ma base
 
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Docker](https://img.shields.io/badge/docker-llama--base-blue?logo=docker)](https://hub.docker.com/r/llama/llama-base)
+[![CI](https://img.shields.io/github/actions/workflow/status/llama/llama-base/ci.yml?branch=main&label=ci)](https://github.com/llama/llama-base/actions)
+
 **The self-hosted, AI-native database console — Supabase Studio's polish, for any Postgres, on your own box.**
 
 Browse schema, edit data, run SQL, and read an at-a-glance Overview dashboard for *any* PostgreSQL database — RDS, Neon, a bare VPS, or your laptop. No vendor lock-in. Runs as a single container you own.
