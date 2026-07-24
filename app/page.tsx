@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { LlamaHeader, LlamaFooter } from "@lla-ma/ui";
+import AppChrome from "./chrome";
 import Sidebar, { type TableRef } from "@/components/Sidebar";
 import SqlEditor from "@/components/SqlEditor";
 import DataGrid from "@/components/DataGrid";
@@ -20,7 +20,6 @@ type Health =
 
 type DbResp = { ok: boolean; databases?: string[]; error?: string };
 type View = "overview" | "browse" | "sql";
-type Theme = "dark" | "light";
 
 export default function Page() {
   const [databases, setDatabases] = useState<string[]>([]);
@@ -32,27 +31,6 @@ export default function Page() {
   const [view, setView] = useState<View>("overview");
   const [readOnly, setReadOnly] = useState(true);
   const [health, setHealth] = useState<Health | null>(null);
-
-  // Theme lives here so the @lla-ma/ui header's toggle can drive it. The
-  // no-flash script in layout.tsx has already set <html data-theme=…> from
-  // localStorage before paint; we read it back on mount.
-  const [theme, setTheme] = useState<Theme>("dark");
-  useEffect(() => {
-    const t = document.documentElement.getAttribute("data-theme");
-    if (t === "light" || t === "dark") setTheme(t);
-  }, []);
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      const next: Theme = prev === "dark" ? "light" : "dark";
-      document.documentElement.setAttribute("data-theme", next);
-      try {
-        localStorage.setItem("theme", next);
-      } catch {
-        /* private mode / storage disabled — fine, just don't persist */
-      }
-      return next;
-    });
-  }, []);
 
   const loadDatabases = useCallback(async () => {
     try {
@@ -90,142 +68,95 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Shared lla.ma shell: logo + Platform·Base·Apps switcher + theme.
-          Full-bleed (maxWidth="100%") so it lines up with the edge-to-edge
-          console toolbar and sidebar below, rather than the 1320px marketing cap. */}
-      <LlamaHeader app="base" theme={theme} onToggleTheme={toggleTheme} maxWidth="100%" />
-
-      {/* The console fills the viewport below the header; the footer follows. */}
-      <div
-        className="flex flex-col"
-        style={{ minHeight: "calc(100vh - 54px)" }}
-      >
-        {/* Console toolbar — view tabs, health, read-only/write switch. */}
-        <div className="flex items-stretch border-b border-[var(--border)] bg-[var(--panel)]">
-          {/* Status block — same width + right border as the sidebar, so the
-              tabs beside it line up with the content panel below. */}
-          <div className="flex w-72 shrink-0 items-center border-r border-[var(--border)] px-3 py-2.5">
-            <HealthDot health={health} />
-          </div>
-
-          {/* Tabs + controls sit over the content panel (px-6 matches its p-6). */}
-          <div className="flex flex-1 items-center gap-4 px-6 py-2.5">
-            <nav className="flex gap-1">
-              <Tab active={view === "overview"} onClick={() => setView("overview")}>
-                overview
-              </Tab>
-              <Tab active={view === "browse"} onClick={() => setView("browse")}>
-                browse
-              </Tab>
-              <Tab active={view === "sql"} onClick={() => setView("sql")}>
-                sql
-              </Tab>
-            </nav>
-
-            <div className="ml-auto" />
-
-            <button
-              onClick={() => setReadOnly((r) => !r)}
-              title="Toggle read-only / write mode"
-              className={`rounded border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
-                readOnly
-                  ? "border-[var(--border)] text-[var(--muted)] hover:text-[var(--fg)]"
-                  : "border-[var(--danger)] bg-[var(--danger)]/10 text-[var(--danger)]"
-              }`}
-            >
-              {readOnly ? "● read-only" : "● write mode"}
-            </button>
-          </div>
+    <AppChrome>
+      {/* Console toolbar — view tabs, health, read-only/write switch. */}
+      <div className="flex items-stretch border-b border-[var(--border)] bg-[var(--panel)]">
+        {/* Status block — same width + right border as the sidebar, so the
+            tabs beside it line up with the content panel below. */}
+        <div className="flex w-72 shrink-0 items-center border-r border-[var(--border)] px-3 py-2.5">
+          <HealthDot health={health} />
         </div>
 
-        <div className="flex min-h-0 flex-1">
-          <Sidebar
-            databases={databases}
-            loadingDbs={loadingDbs}
-            dbError={dbError}
-            selected={selected}
-            onSelect={(t) => {
-              setSelected(t);
-              setActiveDb(t.db);
-              setView("browse");
-            }}
-            onActivateDb={(db) => {
-              setActiveDb(db);
-              setView("overview");
-            }}
-            onNewDatabase={createDatabase}
-          />
+        {/* Tabs + controls sit over the content panel (px-6 matches its p-6). */}
+        <div className="flex flex-1 items-center gap-4 px-6 py-2.5">
+          <nav className="flex gap-1">
+            <Tab active={view === "overview"} onClick={() => setView("overview")}>
+              overview
+            </Tab>
+            <Tab active={view === "browse"} onClick={() => setView("browse")}>
+              browse
+            </Tab>
+            <Tab active={view === "sql"} onClick={() => setView("sql")}>
+              sql
+            </Tab>
+          </nav>
 
-          <main className="min-w-0 flex-1 overflow-hidden">
-            {view === "sql" ? (
-              <SqlEditor
-                databases={databases}
-                initialDb={activeDb}
-                readOnly={readOnly}
-              />
-            ) : view === "overview" ? (
-              activeDb ? (
-                <Overview
-                  key={activeDb}
-                  db={activeDb}
-                  onOpenTable={(schema, table) => {
-                    setSelected({ db: activeDb, schema, table, type: "table" });
-                    setView("browse");
-                  }}
-                />
-              ) : (
-                <Welcome />
-              )
-            ) : selected ? (
-              <TableView
-                key={`${selected.db}.${selected.schema}.${selected.table}`}
-                target={selected}
-                readOnly={readOnly}
-              />
-            ) : (
-              <Welcome />
-            )}
-          </main>
+          <div className="ml-auto" />
+
+          <button
+            onClick={() => setReadOnly((r) => !r)}
+            title="Toggle read-only / write mode"
+            className={`rounded border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
+              readOnly
+                ? "border-[var(--border)] text-[var(--muted)] hover:text-[var(--fg)]"
+                : "border-[var(--danger)] bg-[var(--danger)]/10 text-[var(--danger)]"
+            }`}
+          >
+            {readOnly ? "● read-only" : "● write mode"}
+          </button>
         </div>
       </div>
 
-      <LlamaFooter
-        theme={theme}
-        maxWidth="100%"
-        tagline="The self-hosted, AI-native Postgres console — Supabase Studio's polish, for any Postgres, on your own box."
-        copyright="lla.ma · © 2026 Via Ventures"
-        columns={[
-          {
-            title: "PROJECT",
-            links: [
-              {
-                label: "GitHub",
-                href: "https://github.com/tonyanglesey/llama-base",
-              },
-              { label: "lla.ma", href: "https://lla.ma" },
-            ],
-          },
-          {
-            // TODO: wire real destinations — these are placeholders for now.
-            title: "DEVELOPERS",
-            links: [
-              { label: "Docs", href: "https://lla.ma/docs" },
-              { label: "API status", href: "https://api.lla.ma" },
-              { label: "Sign in", href: "https://lla.ma/login" },
-              { label: "Sign up", href: "https://lla.ma/register" },
-            ],
-          },
-          {
-            title: "COMPANY",
-            links: [
-              { label: "Account", href: "https://lla.ma/account" },
-              { label: "Contact", href: "mailto:hello@lla.ma" },
-            ],
-          },
-        ]}
-      />
-    </div>
+      <div className="flex min-h-0 flex-1">
+        <Sidebar
+          databases={databases}
+          loadingDbs={loadingDbs}
+          dbError={dbError}
+          selected={selected}
+          onSelect={(t) => {
+            setSelected(t);
+            setActiveDb(t.db);
+            setView("browse");
+          }}
+          onActivateDb={(db) => {
+            setActiveDb(db);
+            setView("overview");
+          }}
+          onNewDatabase={createDatabase}
+        />
+
+        <main className="min-w-0 flex-1 overflow-hidden">
+          {view === "sql" ? (
+            <SqlEditor
+              databases={databases}
+              initialDb={activeDb}
+              readOnly={readOnly}
+            />
+          ) : view === "overview" ? (
+            activeDb ? (
+              <Overview
+                key={activeDb}
+                db={activeDb}
+                onOpenTable={(schema, table) => {
+                  setSelected({ db: activeDb, schema, table, type: "table" });
+                  setView("browse");
+                }}
+              />
+            ) : (
+              <Welcome />
+            )
+          ) : selected ? (
+            <TableView
+              key={`${selected.db}.${selected.schema}.${selected.table}`}
+              target={selected}
+              readOnly={readOnly}
+            />
+          ) : (
+            <Welcome />
+          )}
+        </main>
+      </div>
+    </AppChrome>
   );
 }
 
